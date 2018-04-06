@@ -11,7 +11,7 @@
  * Version: 1.0.0
  */
 if ( ! class_exists( 'WooCommerce_Email_Text_Edit' ) ) {
-	require_once 'class-woocommerce-email-text-edit.php';
+	require_once 'lib/class-woocommerce-email-text-edit.php';
 }
 
 add_action( 'plugins_loaded', function() {
