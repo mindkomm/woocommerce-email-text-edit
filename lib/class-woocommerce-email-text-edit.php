@@ -195,7 +195,9 @@ class WooCommerce_Email_Text_Edit {
 		 * @since 1.0.0
 		 * @example
 		 * ```php
-		 * add_filter( 'wc_ete_placeholders_content', function( $placeholders ) {
+		 * add_filter( 'wc_ete/placeholders/content', function( $placeholders ) {
+		 *     $placeholders['{admin_email}'] = get_option( 'admin_email' );
+		 *
 		 *     return $placeholders;
 		 * } );
 		 * ```
@@ -289,10 +291,18 @@ class WooCommerce_Email_Text_Edit {
 		);
 
 		/**
-		 * Filter placeholder description used in admin area.
+		 * Filters placeholder descriptions used in admin area.
 		 *
 		 * @api
 		 * @since 1.0.0
+		 * @example
+		 * ```php
+		 * add_filter( 'wc_ete/placeholders/description', function( $descriptions ) {
+		 *     $descpriptions['{admin_email}'] = 'The email address of the shop owner.'.
+		 *
+		 *     return $descriptions;
+		 * } );
+		 * ```
 		 *
 		 * @param array $descriptions A key-value array of descriptions where the key is the
 		 *                            placeholder and the key is the description of that placeholder.

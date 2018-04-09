@@ -1,0 +1,13 @@
+{
+  "name": "mind/woocommerce-email-text-edit",
+  "authors": [
+    {
+      "name": "Lukas Gaechter",
+      "email": "lukas.gaechter@mind.ch"
+    }
+  ],
+  "require-dev": {
+    "timber/teak": "^1.0"
+  },
+  "minimum-stability": "alpha"
+}
