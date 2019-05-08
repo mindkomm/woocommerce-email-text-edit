@@ -1,5 +1,5 @@
 {
-  "name": "mind/woocommerce-email-text-edit",
+  "name": "mindkomm/woocommerce-email-text-edit",
   "authors": [
     {
       "name": "Lukas Gaechter",
@@ -8,6 +8,11 @@
   ],
   "require-dev": {
     "timber/teak": "^1.0"
+  },
+  "autoload": {
+    "files": [
+      "woocommerce-email-text-edit.php"
+    ]
   },
   "minimum-stability": "alpha"
 }
