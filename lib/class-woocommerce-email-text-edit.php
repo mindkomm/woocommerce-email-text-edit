@@ -13,7 +13,7 @@ class WooCommerce_Email_Text_Edit {
 	 * @var array Array of email IDs.
 	 */
 	public $editable_emails = array(
-		// Default WooCommerce E-Mails
+		// Default WooCommerce E-Mails.
 		'customer_completed_order',
 		'customer_invoice',
 		'customer_note',
@@ -21,7 +21,7 @@ class WooCommerce_Email_Text_Edit {
 		'customer_processing_order',
 		'customer_refunded_order',
 
-		// WooCommerce Subscriptions
+		// WooCommerce Subscriptions.
 		'customer_completed_renewal_order',
 		'customer_completed_switch_order',
 		'customer_payment_retry',
@@ -35,11 +35,12 @@ class WooCommerce_Email_Text_Edit {
 	 * @var array Array of email IDs.
 	 */
 	public $filtered_emails = array(
+		// Default WooCommerce E-Mails.
 		'customer_completed_order',
 		'customer_invoice',
 		'customer_processing_order',
 
-		// WooCommerce Subscriptions
+		// WooCommerce Subscriptions.
 		'customer_completed_renewal_order',
 		'customer_completed_switch_order',
 		'customer_payment_retry',
@@ -77,7 +78,7 @@ class WooCommerce_Email_Text_Edit {
 		 */
 		$this->filtered_emails = apply_filters( 'wc_ete/emails/filtered', $this->filtered_emails );
 
-		// Add form fields for different email types
+		// Add form fields for different email types.
 		foreach ( $this->editable_emails as $type ) {
 			add_filter( "woocommerce_settings_api_form_fields_{$type}", [
 				$this,
@@ -89,14 +90,25 @@ class WooCommerce_Email_Text_Edit {
 		add_action( 'woocommerce_email_header', array( $this, 'catch_header' ), 999, 2 );
 		add_action( 'woocommerce_email_order_details', array( $this, 'catch_order_table' ), 1, 4 );
 
-		// Insert content before email
+		// Insert content before email content.
 		add_action(
 			'woocommerce_email_order_details',
 			array( $this, 'insert_content_before_email' ),
 			9, 4
 		);
 
-		// Compatibility with WooCommerce Subscriptions
+		// Remove footer content that’s already there.
+		add_action( 'woocommerce_email_customer_details', array( $this, 'catch_footer' ), 999, 4 );
+		add_action( 'woocommerce_email_footer', array( $this, 'catch_email_footer' ), 1 );
+
+		// Insert content before footer.
+		add_action(
+			'woocommerce_email_footer',
+			array( $this, 'insert_content_before_footer' ),
+			9
+		);
+
+		// Compatibility with WooCommerce Subscriptions.
 		add_action(
 			'woocommerce_subscriptions_email_order_details',
 			array( $this, 'catch_order_table' ),
@@ -111,7 +123,7 @@ class WooCommerce_Email_Text_Edit {
 	}
 
 	/**
-	 * Start catching content with an output buffer.
+	 * Start catching email content with an output buffer.
 	 *
 	 * @param string   $email_heading Email heading.
 	 * @param WC_Email $email         Email object.
@@ -128,6 +140,27 @@ class WooCommerce_Email_Text_Edit {
 	}
 
 	/**
+	 * Start catching content before footer with an output buffer.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Order $order         Order object.
+	 * @param bool     $sent_to_admin Whether email is sent to admin.
+	 * @param bool     $plain_text    Whether email is plaintext.
+	 * @param WC_Email $email         Email object.
+	 */
+	public function catch_footer( $order, $sent_to_admin, $plain_text, $email = null ) {
+		if ( ! isset( $email->id )
+			|| ! $this->email_should_be_filtered( $email )
+			|| $this->email_footer_is_empty( $email )
+		) {
+			return;
+		}
+
+		ob_start();
+	}
+
+	/**
 	 * Release content buffer into ether.
 	 *
 	 * @param WC_Order $order         Order object.
@@ -136,7 +169,25 @@ class WooCommerce_Email_Text_Edit {
 	 * @param WC_Email $email         Email object.
 	 */
 	public function catch_order_table( $order, $sent_to_admin, $plain_text, $email ) {
-		if ( ! $this->email_should_be_filtered( $email ) || $this->email_content_is_empty( $email )
+		if ( ! $this->email_should_be_filtered( $email )
+			|| $this->email_content_is_empty( $email )
+		) {
+			return;
+		}
+
+		ob_end_clean();
+	}
+
+	/**
+	 * Release content buffer into ether.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Email $email Email object.
+	 */
+	public function catch_email_footer( $email ) {
+		if ( ! $this->email_should_be_filtered( $email )
+			|| $this->email_footer_is_empty( $email )
 		) {
 			return;
 		}
@@ -156,7 +207,7 @@ class WooCommerce_Email_Text_Edit {
 	}
 
 	/**
-	 * Checks whether email text is is empty.
+	 * Checks whether email content text is is empty.
 	 *
 	 * @param WC_Email $email The email to check.
 	 *
@@ -169,7 +220,22 @@ class WooCommerce_Email_Text_Edit {
 	}
 
 	/**
-	 * Insert custom content before an email.
+	 * Checks whether email footer text is is empty.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Email $email The email to check.
+	 *
+	 * @return bool
+	 */
+	public function email_footer_is_empty( $email ) {
+		$settings = $email->get_option( 'email_text_before_footer' );
+
+		return empty( $settings );
+	}
+
+	/**
+	 * Inserts custom content before the email’s content.
 	 *
 	 * @param WC_Order $order         A WooCommerce order object.
 	 * @param bool     $sent_to_admin Whether the email is sent to an admin.
@@ -182,12 +248,14 @@ class WooCommerce_Email_Text_Edit {
 		}
 
 		$placeholders = array(
-			'{blank}'     => '',
-			'{firstname}' => $this->get_first_name( $order ),
+			'{blank}'      => '',
+			'{order_id}'   => $order->get_order_number(),
+			'{first_name}' => $order->get_billing_first_name(),
+			'{last_name}'  => $order->get_billing_last_name(),
 		);
 
 		/**
-		 * Filters placeholder contents.
+		 * Filters email content placeholders.
 		 *
 		 * You can use this to add your own placeholders.
 		 *
@@ -223,37 +291,89 @@ class WooCommerce_Email_Text_Edit {
 		$replace = array_values( $placeholders );
 		$content = str_replace( $find, $replace, $email->settings['email_text_before_content'] );
 
-		// Replace still existing placeholders
+		// Replace still existing placeholders.
 		$content = str_replace( $find, '', $content );
 
-		// Apply default formatting
-		$content = wptexturize( $content );
-		$content = wpautop( $content );
-
-		$content = wp_kses_post( $content );
+		$content = $this->sanitize_content( $content );
 
 		echo $content;
 	}
 
 	/**
-	 * Get firstname from an order.
+	 * Inserts custom content before the email’s footer.
 	 *
-	 * @param WC_Order $order Order object.
+	 * @since 1.1.0
 	 *
-	 * @return bool|string
+	 * @param WC_Email $email A WooCommerce email object.
 	 */
-	public function get_first_name( $order ) {
-		$name = get_post_meta( $order->get_id(), '_billing_first_name', true );
-
-		if ( ! empty( $name ) ) {
-			return $name;
+	public function insert_content_before_footer( $email ) {
+		if ( ! $this->email_should_be_filtered( $email )
+			|| $this->email_footer_is_empty( $email ) ) {
+			return;
 		}
 
-		return false;
+		$placeholders = array(
+			'{blank}' => '',
+		);
+
+		/**
+		 * Filters email footer content placeholders.
+		 *
+		 * You can use this to add your own placeholders.
+		 *
+		 * @api
+		 * @since 1.1.0
+		 * @example
+		 * ```php
+		 * add_filter( 'wc_ete/placeholders/footer', function( $placeholders ) {
+		 *     $placeholders['{admin_email}'] = get_option( 'admin_email' );
+		 *
+		 *     return $placeholders;
+		 * } );
+		 * ```
+		 *
+		 * @param array    $placeholders  A key-value array of placeholders where the key is the
+		 *                                placeholder and the value is the content that should be
+		 *                                used instead of the placeholder in the email text.
+		 * @param WC_Email $email         A WooCommerce email object.
+		 */
+		$placeholders = apply_filters(
+			'wc_ete/placeholders/footer',
+			$placeholders,
+			$email
+		);
+
+		$find    = array_keys( $placeholders );
+		$replace = array_values( $placeholders );
+		$content = str_replace( $find, $replace, $email->settings['email_text_before_footer'] );
+
+		// Replace still existing placeholders.
+		$content = str_replace( $find, '', $content );
+
+		$content = $this->sanitize_content( $content );
+
+		echo $content;
 	}
 
 	/**
-	 * Add form field for additional email text.
+	 * Sanitizes email content.
+	 *
+	 * @param string $content Content string.
+	 *
+	 * @return string
+	 */
+	public function sanitize_content( $content ) {
+		// Apply default formatting.
+		$content = wptexturize( $content );
+		$content = wpautop( $content );
+
+		$content = wp_kses_post( $content );
+
+		return $content;
+	}
+
+	/**
+	 * Add form field for additional email texts.
 	 *
 	 * @param array $fields Existing form fields.
 	 *
@@ -264,7 +384,15 @@ class WooCommerce_Email_Text_Edit {
 			'title'       => __( 'Email text before content', 'woocommerce-email-text-edit' ),
 			'type'        => 'textarea',
 			'description' => __( 'Available Placeholders', 'woocommerce-email-text-edit' )
-								. $this->create_placeholder_descriptions(),
+				. $this->create_placeholder_description_content(),
+			'default'     => '',
+		);
+
+		$fields['email_text_before_footer'] = array(
+			'title'       => __( 'Email text before footer', 'woocommerce-email-text-edit' ),
+			'type'        => 'textarea',
+			'description' => __( 'Available Placeholders', 'woocommerce-email-text-edit' )
+				. $this->create_placeholder_description_footer(),
 			'default'     => '',
 		);
 
@@ -272,24 +400,61 @@ class WooCommerce_Email_Text_Edit {
 	}
 
 	/**
-	 * Generate descriptions for placeholders.
+	 * Creats placeholder descriptions for email content.
 	 *
-	 * Placeholder descriptions will be displayed below the edit field of the email.
-	 *
+	 * @since 1.1.0
 	 * @return string
 	 */
-	public function create_placeholder_descriptions() {
+	public function create_placeholder_description_content() {
 		$descriptions = array(
 			'{blank}'      => __(
 				'Add only this tag to the content to leave email content empty',
+				'woocommerce-email-text-edit'
+			),
+			'{order_id}'   => __(
+				'Order number/ID',
 				'woocommerce-email-text-edit'
 			),
 			'{first_name}' => __(
 				'First name from billing address',
 				'woocommerce-email-text-edit'
 			),
+			'{last_name}'  => __(
+				'Last name from billing address',
+				'woocommerce-email-text-edit'
+			),
 		);
 
+		return $this->create_placeholder_descriptions( $descriptions );
+	}
+
+	/**
+	 * Creates placeholder descriptions for email footer.
+	 *
+	 * @since 1.1.0
+	 * @return string
+	 */
+	public function create_placeholder_description_footer() {
+		$descriptions = array(
+			'{blank}' => __(
+				'Add only this tag to the content to leave email content empty',
+				'woocommerce-email-text-edit'
+			),
+		);
+
+		return $this->create_placeholder_descriptions( $descriptions );
+	}
+
+	/**
+	 * Generates descriptions for placeholders.
+	 *
+	 * Placeholder descriptions will be displayed below the edit field of the email.
+	 *
+	 * @param array $descriptions Default descriptions.
+	 *
+	 * @return string
+	 */
+	public function create_placeholder_descriptions( $descriptions ) {
 		/**
 		 * Filters placeholder descriptions used in admin area.
 		 *
