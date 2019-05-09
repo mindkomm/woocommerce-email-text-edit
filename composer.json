@@ -19,6 +19,7 @@
   "minimum-stability": "alpha",
   "prefer-stable": true,
   "scripts": {
+    "i18n": "wp i18n make-pot . languages/woocommerce-email-text-edit.pot --domain='woocommerce-email-text-edit' --package-name='woocommerce-email-text-edit'",
     "doc": "./vendor/bin/teak generate:hook-reference ./lib --output ./docs --hook_type=filter --file_name=filters --file_title='Filter Hooks'"
   }
 }
