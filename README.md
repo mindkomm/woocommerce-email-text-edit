@@ -6,7 +6,7 @@ Unlike other plugins, it will not overwrite your existing email template files.
 
 ## Usage
 
-After you’ve installed the plugin, go to WooCommerce > Settings > Emails and select a customer email that you want to edit. You’ll find a new edit field where you can edit the content of the email.
+After you’ve installed the plugin, go to **WooCommerce** &rarr; **Settings** &rarr; **Emails** and select a customer email that you want to edit. You’ll find a new edit field where you can edit the content of the email.
 
 The following custom emails are supported:
 

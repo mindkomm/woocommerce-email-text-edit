@@ -14,5 +14,9 @@
       "woocommerce-email-text-edit.php"
     ]
   },
-  "minimum-stability": "alpha"
+  "minimum-stability": "alpha",
+  "prefer-stable": true,
+  "scripts": {
+    "doc": "./vendor/bin/teak generate:hook-reference ./lib --output ./docs --hook_type=filter --file_name=filters --file_title='Filter Hooks'"
+  }
 }

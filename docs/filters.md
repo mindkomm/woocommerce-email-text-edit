@@ -1,8 +1,8 @@
 # Filter Hooks
 
-## wc\_ete/emails/editable
+##  wc\_ete/emails/editable
 
-<p class="summary">Filters email IDs that should have an edit field in the settings.</p>
+Filters email IDs that should have an edit field in the settings.
 
 For all emails passed in this list, a textarea will be added to the settings where the
 email text can be edited.
@@ -13,11 +13,9 @@ email text can be edited.
 | --- | --- | --- |
 | $editable_emails | `array` | An array of email IDs that should be editable. |
 
----
+##  wc\_ete/emails/filtered
 
-## wc\_ete/emails/filtered
-
-<p class="summary">Filters email IDs where default content should be removed.</p>
+Filters email IDs where default content should be removed.
 
 For all emails passed in this list the default content that is defined in the email
 template before the order details will be removed.
@@ -28,11 +26,9 @@ template before the order details will be removed.
 | --- | --- | --- |
 | $filtered_emails | `array` | An array of email IDs where the default content should be removed. |
 
----
-
 ## wc\_ete/placeholders/content
 
-<p class="summary">Filters placeholder contents.</p>
+Filters email content placeholders.
 
 You can use this to add your own placeholders.
 
@@ -56,11 +52,32 @@ add_filter( 'wc_ete/placeholders/content', function( $placeholders ) {
 } );
 ```
 
----
+## wc\_ete/placeholders/footer
 
-## wc\_ete/placeholders/description
+Filters email footer content placeholders.
 
-<p class="summary">Filters placeholder description used in admin area.</p>
+You can use this to add your own placeholders.
+
+**since** 1.1.0 
+
+| Name | Type | Description |
+| --- | --- | --- |
+| $placeholders | `array` | A key-value array of placeholders where the key is the placeholder and the value is the content that should be used instead of the placeholder in the email text. |
+| $email | `\WC_Email` | A WooCommerce email object. |
+
+**PHP**
+
+```php
+add_filter( 'wc_ete/placeholders/footer', function( $placeholders ) {
+    $placeholders['{admin_email}'] = get_option( 'admin_email' );
+
+    return $placeholders;
+} );
+```
+
+##  wc\_ete/placeholders/description
+
+Filters placeholder descriptions used in admin area.
 
 **since** 1.0.0 
 
@@ -77,6 +94,4 @@ add_filter( 'wc_ete/placeholders/description', function( $descriptions ) {
     return $descriptions;
 } );
 ```
-
----
 
