@@ -1,5 +1,7 @@
 {
   "name": "mindkomm/woocommerce-email-text-edit",
+  "description": "Modify email texts used in your WooCommerce emails without having to edit email templates.",
+  "license": "MIT",
   "authors": [
     {
       "name": "Lukas Gaechter",
