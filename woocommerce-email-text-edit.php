@@ -10,6 +10,10 @@
  * Domain Path: languages/
  * Version: 1.0.0
  */
+if ( ! defined( 'ABSPATH' ) ) {
+	return;
+}
+
 if ( ! class_exists( 'WooCommerce_Email_Text_Edit' ) ) {
 	require_once 'lib/class-woocommerce-email-text-edit.php';
 }
