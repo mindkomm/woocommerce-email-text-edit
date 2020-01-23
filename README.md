@@ -25,13 +25,17 @@ The following custom emails are supported:
 - Processing order
 - Refunded order
 
-Additionally, if you use the WooCommerce Subscriptions plugin, the following email types are supported as well:
+Additionally, if you use the 
+*WooCommerce Subscriptions* plugin, the following email types are supported as well:
 
 - Completed Renewal Order
 - Subscription Switch Complete
 - Customer Payment Retry
 - Processing Renewal Order
 - Customer Renewal Invoice
+
+If you want to test how your emails will look without having to create and send a lot of orders, you can use the very handy [WooCommerce Email Test](https://wordpress.org/plugins/woocommerce-email-test/) plugin.
+
 
 ## Technical details
 

@@ -38,7 +38,10 @@ class WooCommerce_Email_Text_Edit {
 		// Default WooCommerce E-Mails.
 		'customer_completed_order',
 		'customer_invoice',
+		'customer_note',
+		'customer_on_hold_order',
 		'customer_processing_order',
+		'customer_refunded_order',
 
 		// WooCommerce Subscriptions.
 		'customer_completed_renewal_order',
