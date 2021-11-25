@@ -206,11 +206,11 @@ class WooCommerce_Email_Text_Edit {
 	 * @return bool
 	 */
 	public function email_should_be_filtered( $email ) {
-		return in_array( $email->id, $this->filtered_emails, true );
+		return $email && in_array( $email->id, $this->filtered_emails, true );
 	}
 
 	/**
-	 * Checks whether email content text is is empty.
+	 * Checks whether email content text is empty.
 	 *
 	 * @param WC_Email $email The email to check.
 	 *
